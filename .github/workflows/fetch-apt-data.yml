@@ -2,8 +2,7 @@ name: Fetch Apartment Data
 
 on:
   schedule:
-    # 매월 28~31일 15:00 UTC (한국시간 자정) 에 실행 → 마지막 날 여부는 Python에서 확인
-    - cron: '0 15 28-31 * *'
+    - cron: '0 1 1 * *'   # 매월 1일 01:00 UTC (한국시간 10:00)
   workflow_dispatch:       # GitHub Actions 탭에서 수동 실행 가능
 
 jobs:
@@ -16,35 +15,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Check if today is the last day of the month
-        id: check_last_day
-        run: |
-          TODAY=$(date -u +%d)
-          LAST=$(python3 -c "import calendar, datetime; d=datetime.date.today(); print(calendar.monthrange(d.year, d.month)[1])")
-          if [ "$TODAY" -eq "$LAST" ]; then
-            echo "is_last_day=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "is_last_day=false" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Set up Python
-        if: steps.check_last_day.outputs.is_last_day == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
       - name: Install dependencies
-        if: steps.check_last_day.outputs.is_last_day == 'true'
         run: pip install requests
 
       - name: Fetch apartment data
-        if: steps.check_last_day.outputs.is_last_day == 'true'
         env:
           MOLIT_API_KEY: ${{ secrets.MOLIT_API_KEY }}
         run: python scripts/fetch_apt_data.py
 
       - name: Commit and push
-        if: steps.check_last_day.outputs.is_last_day == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
