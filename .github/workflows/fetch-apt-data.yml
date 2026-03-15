@@ -1,0 +1,37 @@
+name: Fetch Apartment Data
+
+on:
+  schedule:
+    - cron: '0 1 1 * *'   # 매월 1일 01:00 UTC (한국시간 10:00)
+  workflow_dispatch:       # GitHub Actions 탭에서 수동 실행 가능
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Fetch apartment data
+        env:
+          MOLIT_API_KEY: ${{ secrets.MOLIT_API_KEY }}
+        run: python scripts/fetch_apt_data.py
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/apt_deals.json
+          git diff --staged --quiet || git commit -m "data: apt deals $(date +'%Y%m')"
+          git push
