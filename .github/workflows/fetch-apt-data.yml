@@ -32,6 +32,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/apt_deals.json
+          git add apt-deals-data/apt_deals.json
           git diff --staged --quiet || git commit -m "data: apt deals $(date +'%Y%m')"
           git push

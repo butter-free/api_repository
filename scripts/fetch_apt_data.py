@@ -125,9 +125,9 @@ output = {
     "gyeonggi": gyeonggi,
 }
 
-os.makedirs("data", exist_ok=True)
-with open("data/apt_deals.json", "w", encoding="utf-8") as f:
+os.makedirs("apt-deals-data", exist_ok=True)
+with open("apt-deals-data/apt_deals.json", "w", encoding="utf-8") as f:
     json.dump(output, f, ensure_ascii=False, indent=2)
 
 print(f"\n✅ 완료: 서울 {len(seoul)}건 / 경기 {len(gyeonggi)}건")
-print(f"   저장: data/apt_deals.json")
+print(f"   저장: apt-deals-data/apt_deals.json")
